@@ -1,12 +1,15 @@
 from django.shortcuts import render
 from rest_framework import viewsets, permissions
-from .serializers import NoteSerializer, UserSerializer, DailyTaskSerializer
-from .models import User, Note, DailyTask
+from .serializers import NoteSerializer, UserSerializer, DailyTaskSerializer, MedicationSerializer, EventSerializer
+from .models import Note, DailyTask, Medication, Event
+from django.contrib.auth.models import User
 from rest_framework.views import APIView
 from django.contrib import auth
 from rest_framework.response import Response
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import ensure_csrf_cookie, csrf_protect
+
+# USER HOUSEKEEPING
 
 @method_decorator(csrf_protect, name='dispatch')
 class SignupView(APIView):
@@ -45,7 +48,6 @@ class LoginView(APIView):
         else:
             return Response({ 'error': 'unable to log in' })
 
-
 class LogoutView(APIView):
     def post(self, request, format=None):
         auth.logout(request)
@@ -68,6 +70,9 @@ class GetUsersView(APIView):
         users = UserSerializer(users, many=True)
         return Response(users.data)
 
+
+# MODEL VIEWS
+
 class NoteViewSet(viewsets.ModelViewSet):
     serializer_class = NoteSerializer
     queryset = Note.objects.all()
@@ -86,3 +91,20 @@ class DailyTaskViewSet(viewsets.ModelViewSet):
         query_set = queryset.filter(user=self.request.user)
         return query_set
 
+class MedicationViewSet(viewsets.ModelViewSet):
+    serializer_class = MedicationSerializer
+    queryset = Medication.objects.all()
+
+    def get_queryset(self): 
+        queryset = self.queryset
+        query_set = queryset.filter(user=self.request.user)
+        return query_set
+
+class EventViewSet(viewsets.ModelViewSet):
+    serializer_class =EventSerializer
+    queryset = Event.objects.all()
+
+    def get_queryset(self): 
+        queryset = self.queryset
+        query_set = queryset.filter(user=self.request.user)
+        return query_set
