@@ -1,8 +1,16 @@
-from rest_framework import routers 
-from .views import UserViewSet, NoteViewSet
+from rest_framework import routers
+from .views import GetUsersView, LoginView, NoteViewSet, SignupView, GetCSRFToken,LogoutView, DailyTaskViewSet
+from django.urls import path, include
 
 router = routers.DefaultRouter()
-router.register(r'api/users', UserViewSet, 'users')
-router.register(r'api/notes', NoteViewSet, 'notes')
+router.register('notes', NoteViewSet, 'notes')
+router.register('dailytasks', DailyTaskViewSet, 'daily tasks' )
 
-urlpatterns = router.urls
+urlpatterns = [
+    path('', include(router.urls)),
+    path('signup', SignupView.as_view()),
+    path('login', LoginView.as_view()),
+    path('logout', LogoutView.as_view()),
+    path('csrf', GetCSRFToken.as_view()),
+    path('users', GetUsersView.as_view())
+]
