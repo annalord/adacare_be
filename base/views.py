@@ -7,11 +7,11 @@ from rest_framework.views import APIView
 from django.contrib import auth
 from rest_framework.response import Response
 from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import ensure_csrf_cookie, csrf_protect
+from django.views.decorators.csrf import ensure_csrf_cookie, csrf_protect, csrf_exempt
 
 # USER HOUSEKEEPING
 
-@method_decorator(csrf_protect, name='dispatch')
+@method_decorator(csrf_exempt, name='dispatch') #exempt not protect 
 class SignupView(APIView):
     permission_classes = (permissions.AllowAny, )
 
@@ -30,7 +30,7 @@ class SignupView(APIView):
 
             return Response({ 'success': 'user created' })
 
-@method_decorator(csrf_protect, name='dispatch')
+@method_decorator(csrf_protect, name='dispatch') #exempt or protect 
 class LoginView(APIView):
     permission_classes = (permissions.AllowAny, )
 
@@ -48,7 +48,9 @@ class LoginView(APIView):
         else:
             return Response({ 'error': 'unable to log in' })
 
+@method_decorator(csrf_protect, name='dispatch') #exempt or protect 
 class LogoutView(APIView):
+    # @csrf_exempt
     def post(self, request, format=None):
         auth.logout(request)
         return Response({ 'success': 'logged out' })
@@ -69,6 +71,21 @@ class GetUsersView(APIView):
 
         users = UserSerializer(users, many=True)
         return Response(users.data)
+
+
+class CheckAuthenticatedView(APIView):
+    def get(self, request, format=None):
+        user = self.request.user
+
+        try:
+            isAuthenticated = user.is_authenticated
+
+            if isAuthenticated:
+                return Response({ 'isAuthenticated': 'success' })
+            else:
+                return Response({ 'isAuthenticated': 'error' })
+        except:
+            return Response({ 'error': 'Something went wrong when checking authentication status' })
 
 
 # MODEL VIEWS

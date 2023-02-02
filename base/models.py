@@ -5,6 +5,7 @@ from django.contrib.auth import get_user_model
 
 class Note(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    author = models.CharField(max_length=20)
     message = models.TextField()
     date_time_created = models.DateTimeField(auto_now_add=True)
 

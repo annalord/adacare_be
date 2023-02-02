@@ -45,20 +45,26 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'base']
+    
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    # 'adacare_be.middle.DisableCSRF',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware'
 ]
     
-CORS_ORIGIN_ALLOW_ALL = True #REMOVE THIS WHEN NOT WORKING ON LOCALHOST?
+CORS_ORIGIN_ALLOW_ALL = False 
+CSRF_TRUSTED_ORIGINS = ['http://localhost:3000']
+CORS_ORIGIN_WHITELIST = [
+    'http://localhost:3000', # replace with the URL of your React front-end
+]
+# CSRF_HEADER_NAME = "X-CSRFToken"
 
 ROOT_URLCONF = 'adacare_be.urls'
 
