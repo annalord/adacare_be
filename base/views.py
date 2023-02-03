@@ -8,8 +8,19 @@ from django.contrib import auth
 from rest_framework.response import Response
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import ensure_csrf_cookie, csrf_protect, csrf_exempt
+from django.views.decorators.csrf import requires_csrf_token
 
 # USER HOUSEKEEPING
+
+from django.http import JsonResponse
+from django.middleware.csrf import get_token
+
+def csrf(request):
+    return JsonResponse({'csrfToken': get_token(request)})
+
+def ping(request):
+    return JsonResponse({'result': 'OK'})
+
 
 @method_decorator(csrf_exempt, name='dispatch') #exempt not protect 
 class SignupView(APIView):
@@ -48,10 +59,15 @@ class LoginView(APIView):
         else:
             return Response({ 'error': 'unable to log in' })
 
-@method_decorator(csrf_protect, name='dispatch') #exempt or protect 
+# @method_decorator(csrf_protect, name='dispatch') #exempt or protect 
+
 class LogoutView(APIView):
     # @csrf_exempt
+    permission_classes = (permissions.AllowAny, )
+    # @requires_csrf_token
     def post(self, request, format=None):
+        print('inside logout post')
+        print(request)
         auth.logout(request)
         return Response({ 'success': 'logged out' })
 

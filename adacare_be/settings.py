@@ -58,7 +58,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware'
 ]
-    
+
+CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_ALLOW_ALL = False 
 CSRF_TRUSTED_ORIGINS = ['http://localhost:3000']
 CORS_ORIGIN_WHITELIST = [
