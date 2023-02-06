@@ -1,6 +1,7 @@
 *.pyc
 /__pycache__/
+/pycache/*
 db.sqlite3
 /venv
 *.env
-.vscode
+.vscodegit a

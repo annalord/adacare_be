@@ -30,6 +30,6 @@ class Event(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     title = models.CharField(max_length=50)
     details = models.TextField()
-    start = models.TimeField(null=True)
-    end = models.TimeField(null=True)
+    start = models.DateTimeField(null=True)
+    end = models.DateTimeField(null=True)
     all_day = models.BooleanField(default=False) 

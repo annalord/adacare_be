@@ -55,7 +55,7 @@ class LoginView(APIView):
 
         if user is not None:
             auth.login(request, user)
-            return Response({ 'success': 'logged in' })
+            return Response({ 'success': 'logged in', 'user_id': user.id, 'user_name': user.first_name })
         else:
             return Response({ 'error': 'unable to log in' })
 
@@ -78,15 +78,15 @@ class GetCSRFToken(APIView):
     def get(self, request, format=None):
         return Response({ 'success': 'CSRF token created' })
 
-# GET RID OF THIS BEFORE DEPLOYMENT - SHOWS ALL USER DATA 
-class GetUsersView(APIView):
-    permission_classes = (permissions.AllowAny, )  
+# # GET RID OF THIS BEFORE DEPLOYMENT - SHOWS ALL USER DATA 
+# class GetUsersView(APIView):
+#     permission_classes = (permissions.AllowAny, )  
 
-    def get(self):
-        users = User.objects.all()
+#     def get(self):
+#         users = User.objects.all()
 
-        users = UserSerializer(users, many=True)
-        return Response(users.data)
+#         users = UserSerializer(users, many=True)
+#         return Response(users.data)
 
 
 class CheckAuthenticatedView(APIView):
