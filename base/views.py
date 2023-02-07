@@ -41,7 +41,7 @@ class SignupView(APIView):
 
             return Response({ 'success': 'user created' })
 
-@method_decorator(csrf_protect, name='dispatch') #exempt or protect 
+@method_decorator(ensure_csrf_cookie, name='dispatch') #exempt or protect?? 
 class LoginView(APIView):
     permission_classes = (permissions.AllowAny, )
 

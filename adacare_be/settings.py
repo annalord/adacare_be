@@ -53,19 +53,28 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    # 'adacare_be.middle.DisableCSRF',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware'
 ]
 
+# MIDDLEWARE = [    'corsheaders.middleware.CorsMiddleware',    'django.middleware.security.SecurityMiddleware',    'django.contrib.sessions.middleware.SessionMiddleware',    'django.middleware.common.CommonMiddleware',    'django.middleware.csrf.CsrfViewMiddleware',    'django.contrib.auth.middleware.AuthenticationMiddleware',    'django.contrib.messages.middleware.MessageMiddleware',    'django.middleware.clickjacking.XFrameOptionsMiddleware']
+
+# SESSION_COOKIE_SECURE = True
+
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_ALLOW_ALL = False 
-CSRF_TRUSTED_ORIGINS = ['http://localhost:3000']
 CORS_ORIGIN_WHITELIST = [
-    'http://localhost:3000', # replace with the URL of your React front-end
+    'http://localhost:3000',
+    'https://adacare.herokuapp.com'
 ]
+CSRF_TRUSTED_ORIGINS = ['http://localhost:3000', 'https://adacare.herokuapp.com']
+
 # CSRF_HEADER_NAME = "X-CSRFToken"
+
+# CSRF_COOKIE_SAMESITE = 'None'
+# SESSION_COOKIE_SAMESITE = 'None' 
+# CSRF_COOKIE_SECURE = True
 
 ROOT_URLCONF = 'adacare_be.urls'
 
@@ -155,3 +164,4 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
     ]
 }
+
