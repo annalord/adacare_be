@@ -14,13 +14,14 @@ class DailyTask(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     task = models.CharField(max_length=50)
     time = models.TimeField(null=True) #10:30
+    completed = models.BooleanField(default=False)
 
 
 class Medication(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     med_name = models.CharField(max_length=25)
     dosage = models.CharField(max_length=50)
-    time = models.TimeField(null=True)
+    time = models.CharField(max_length=50)
     notes = models.CharField(max_length=200)
     refill_date = models.DateField(null=True) #YYYY-MM-DD
     is_prescription = models.BooleanField()
@@ -29,7 +30,7 @@ class Medication(models.Model):
 class Event(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     title = models.CharField(max_length=50)
-    details = models.TextField()
-    start = models.DateTimeField(null=True)
+    details = models.TextField(null=True)
+    start = models.DateTimeField()
     end = models.DateTimeField(null=True)
     all_day = models.BooleanField(default=False) 

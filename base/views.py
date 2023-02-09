@@ -31,11 +31,17 @@ class SignupView(APIView):
 
         username = data['username']
         password = data['password']
+        pw_repeat = data['pw_repeat']
+        first_name = data['first_name']
 
         if User.objects.filter(username=username).exists():
-            return Response({ 'error': 'username taken' })
+            print('UN TAKEN')
+            return Response({'error': 'Sorry, that username is taken'})
+        elif password != pw_repeat:
+            print('PW DONTMATCH')
+            return Response({'error': 'passwords do not match'})
         else:
-            user = User.objects.create_user(username=username, password=password)
+            user = User.objects.create_user(username=username, password=password, first_name=first_name)
 
             user = User.objects.get(id=user.id)
 
