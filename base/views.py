@@ -1,28 +1,17 @@
-from django.shortcuts import render
-from rest_framework import viewsets, permissions
-from .serializers import NoteSerializer, UserSerializer, DailyTaskSerializer, MedicationSerializer, EventSerializer
+from rest_framework import viewsets, permissions, generics
+from .serializers import NoteSerializer, DailyTaskSerializer, MedicationSerializer, EventSerializer
 from .models import Note, DailyTask, Medication, Event
 from django.contrib.auth.models import User
 from rest_framework.views import APIView
 from django.contrib import auth
 from rest_framework.response import Response
 from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import ensure_csrf_cookie, csrf_protect, csrf_exempt
-from django.views.decorators.csrf import requires_csrf_token
+from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
+
 
 # USER HOUSEKEEPING
 
-from django.http import JsonResponse
-from django.middleware.csrf import get_token
-
-def csrf(request):
-    return JsonResponse({'csrfToken': get_token(request)})
-
-def ping(request):
-    return JsonResponse({'result': 'OK'})
-
-
-@method_decorator(csrf_exempt, name='dispatch') #exempt not protect 
+@method_decorator(csrf_exempt, name='dispatch') 
 class SignupView(APIView):
     permission_classes = (permissions.AllowAny, )
 
@@ -39,7 +28,7 @@ class SignupView(APIView):
             return Response({'error': 'Sorry, that username is taken'})
         elif password != pw_repeat:
             print('PW DONTMATCH')
-            return Response({'error': 'passwords do not match'})
+            return Response({'error': 'Passwords do not match'})
         else:
             user = User.objects.create_user(username=username, password=password, first_name=first_name)
 
@@ -47,7 +36,7 @@ class SignupView(APIView):
 
             return Response({ 'success': 'user created' })
 
-@method_decorator(ensure_csrf_cookie, name='dispatch') #exempt or protect?? 
+@method_decorator(ensure_csrf_cookie, name='dispatch') 
 class LoginView(APIView):
     permission_classes = (permissions.AllowAny, )
 
@@ -65,49 +54,22 @@ class LoginView(APIView):
         else:
             return Response({ 'error': 'unable to log in' })
 
-# @method_decorator(csrf_protect, name='dispatch') #exempt or protect 
-
 class LogoutView(APIView):
-    # @csrf_exempt
     permission_classes = (permissions.AllowAny, )
-    # @requires_csrf_token
     def post(self, request, format=None):
         print('inside logout post')
         print(request)
         auth.logout(request)
         return Response({ 'success': 'logged out' })
 
-@method_decorator(ensure_csrf_cookie, name='dispatch')
-class GetCSRFToken(APIView):
-    permission_classes = (permissions.AllowAny, )
+# @method_decorator(ensure_csrf_cookie, name='dispatch') --- for use in development only
+# class GetCSRFToken(APIView):
+#     permission_classes = (permissions.AllowAny, )
 
-    def get(self, request, format=None):
-        return Response({ 'success': 'CSRF token created' })
-
-# # GET RID OF THIS BEFORE DEPLOYMENT - SHOWS ALL USER DATA 
-# class GetUsersView(APIView):
-#     permission_classes = (permissions.AllowAny, )  
-
-#     def get(self):
-#         users = User.objects.all()
-
-#         users = UserSerializer(users, many=True)
-#         return Response(users.data)
+#     def get(self, request, format=None):
+#         return Response({ 'success': 'CSRF token created' })
 
 
-class CheckAuthenticatedView(APIView):
-    def get(self, request, format=None):
-        user = self.request.user
-
-        try:
-            isAuthenticated = user.is_authenticated
-
-            if isAuthenticated:
-                return Response({ 'isAuthenticated': 'success' })
-            else:
-                return Response({ 'isAuthenticated': 'error' })
-        except:
-            return Response({ 'error': 'Something went wrong when checking authentication status' })
 
 
 # MODEL VIEWS
@@ -136,8 +98,12 @@ class MedicationViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self): 
         queryset = self.queryset
+        is_prescription = self.request.query_params.get('is_prescription', None)
+        if is_prescription:
+            queryset = queryset.filter(is_prescription=is_prescription)
         query_set = queryset.filter(user=self.request.user)
         return query_set
+
 
 class EventViewSet(viewsets.ModelViewSet):
     serializer_class =EventSerializer
@@ -145,5 +111,8 @@ class EventViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self): 
         queryset = self.queryset
+        start_date = self.request.query_params.get('start_date', None)
+        if start_date:
+            queryset = queryset.filter(start__date=start_date)
         query_set = queryset.filter(user=self.request.user)
         return query_set

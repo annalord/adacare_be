@@ -1,5 +1,4 @@
 from django.db import models
-from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 
 
@@ -22,8 +21,8 @@ class Medication(models.Model):
     med_name = models.CharField(max_length=25)
     dosage = models.CharField(max_length=50)
     time = models.CharField(max_length=50)
-    notes = models.CharField(max_length=200)
-    refill_date = models.DateField(null=True) #YYYY-MM-DD
+    notes = models.CharField(max_length=200, null=True, blank=True)
+    refill_date = models.CharField(max_length=25, null=True) 
     is_prescription = models.BooleanField()
 
 
@@ -34,3 +33,5 @@ class Event(models.Model):
     start = models.DateTimeField()
     end = models.DateTimeField(null=True)
     all_day = models.BooleanField(default=False) 
+    completed = models.BooleanField(default=False)
+
