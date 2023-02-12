@@ -1,4 +1,4 @@
-from rest_framework import viewsets, permissions, generics
+from rest_framework import viewsets, permissions
 from .serializers import NoteSerializer, DailyTaskSerializer, MedicationSerializer, EventSerializer
 from .models import Note, DailyTask, Medication, Event
 from django.contrib.auth.models import User
@@ -6,8 +6,8 @@ from rest_framework.views import APIView
 from django.contrib import auth
 from rest_framework.response import Response
 from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
-
+from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt, csrf_protect
+from rest_framework.authtoken.models import Token
 
 # USER HOUSEKEEPING
 
@@ -48,27 +48,39 @@ class LoginView(APIView):
 
         user = auth.authenticate(username=username, password=password)
 
+        # print(auth.authenticate(username=username, password=password))
+
         if user is not None:
+          token, _ = Token.objects.get_or_create(user=user)
+          try:
+            print(f'login user {user}')
             auth.login(request, user)
-            return Response({ 'success': 'logged in', 'user_id': user.id, 'user_name': user.first_name })
+            print(f'self.request.user after login {self.request.user}')
+          except:
+            print('user not actually logged in!')
+          return Response({'success': 'logged in', 'key': token.key, 'user_id': user.id, 'user_name': user.first_name })
         else:
             return Response({ 'error': 'unable to log in' })
+
 
 class LogoutView(APIView):
     permission_classes = (permissions.AllowAny, )
     def post(self, request, format=None):
-        print('inside logout post')
-        print(request)
+
+        # request.user.auth_token.delete()
+        print(f'inside logout post--{request.user.is_authenticated}')
+        print(f'logout self.request.user {self.request.user}')
+
         auth.logout(request)
-        return Response({ 'success': 'logged out' })
+        response = Response({ 'success': 'logged out' })
+        return response
 
-# @method_decorator(ensure_csrf_cookie, name='dispatch') --- for use in development only
-# class GetCSRFToken(APIView):
-#     permission_classes = (permissions.AllowAny, )
+@method_decorator(ensure_csrf_cookie, name='dispatch') #for use in development only
+class GetCSRFToken(APIView):
+    permission_classes = (permissions.AllowAny, )
 
-#     def get(self, request, format=None):
-#         return Response({ 'success': 'CSRF token created' })
-
+    def get(self, request, format=None):
+        return Response({ 'success': 'CSRF token created' })
 
 
 
@@ -81,6 +93,8 @@ class NoteViewSet(viewsets.ModelViewSet):
     def get_queryset(self): 
         queryset = self.queryset
         query_set = queryset.filter(user=self.request.user)
+        print(f'note self.request.user {self.request.user}')
+
         return query_set
 
 class DailyTaskViewSet(viewsets.ModelViewSet):
