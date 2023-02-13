@@ -1,15 +1,15 @@
 from rest_framework import viewsets, permissions
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.authtoken.models import Token
+from django.contrib.auth.models import User
+from django.contrib import auth
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
 from .serializers import NoteSerializer, DailyTaskSerializer, MedicationSerializer, EventSerializer
 from .models import Note, DailyTask, Medication, Event
-from django.contrib.auth.models import User
-from rest_framework.views import APIView
-from django.contrib import auth
-from rest_framework.response import Response
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt, csrf_protect
-from rest_framework.authtoken.models import Token
 
-# USER HOUSEKEEPING
+# USER MANAGEMENT VIEWS
 
 @method_decorator(csrf_exempt, name='dispatch') 
 class SignupView(APIView):
@@ -24,11 +24,9 @@ class SignupView(APIView):
         first_name = data['first_name']
 
         if User.objects.filter(username=username).exists():
-            print('UN TAKEN')
-            return Response({'error': 'Sorry, that username is taken'})
+            return Response({'username_error': 'Sorry, that username is taken'})
         elif password != pw_repeat:
-            print('PW DONTMATCH')
-            return Response({'error': 'Passwords do not match'})
+            return Response({'password_error': 'Passwords do not match'})
         else:
             user = User.objects.create_user(username=username, password=password, first_name=first_name)
 
@@ -46,33 +44,26 @@ class LoginView(APIView):
         username = data['username']
         password = data['password']
 
-        user = auth.authenticate(username=username, password=password)
+        try:
+          user = auth.authenticate(username=username, password=password)
+        except:
+          return Response({'error': 'unable to authenticate user'})
 
         # print(auth.authenticate(username=username, password=password))
 
         if user is not None:
           token, _ = Token.objects.get_or_create(user=user)
-          try:
-            print(f'login user {user}')
-            auth.login(request, user)
-            print(f'self.request.user after login {self.request.user}')
-          except:
-            print('user not actually logged in!')
+          auth.login(request, user)
           return Response({'success': 'logged in', 'key': token.key, 'user_id': user.id, 'user_name': user.first_name })
         else:
-            return Response({ 'error': 'unable to log in' })
-
+            return Response({ 'error': 'unable to log in after authenticating' })
 
 class LogoutView(APIView):
     permission_classes = (permissions.AllowAny, )
+
     def post(self, request, format=None):
-
-        # request.user.auth_token.delete()
-        print(f'inside logout post--{request.user.is_authenticated}')
-        print(f'logout self.request.user {self.request.user}')
-
         auth.logout(request)
-        response = Response({ 'success': 'logged out' })
+        response = Response({ 'success': 'user logged out' })
         return response
 
 @method_decorator(ensure_csrf_cookie, name='dispatch') #for use in development only

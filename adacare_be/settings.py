@@ -28,11 +28,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = env("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-# APPEND_SLASH=False
+DEBUG = False
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['https://adacare-be.herokuapp.com/']
 
 # Application definition
 
@@ -61,8 +59,6 @@ MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
-# SESSION_COOKIE_SECURE = True
-
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_ALLOW_ALL = False 
 CORS_ORIGIN_WHITELIST = [
@@ -72,7 +68,7 @@ CORS_ORIGIN_WHITELIST = [
 CSRF_TRUSTED_ORIGINS = ['http://localhost:3000', 'https://adacare.herokuapp.com']
 
 # CSRF_HEADER_NAME = "X-CSRFToken"
-
+# SESSION_COOKIE_SECURE = True
 # CSRF_COOKIE_SAMESITE = 'None'
 # SESSION_COOKIE_SAMESITE = 'None' 
 # CSRF_COOKIE_SECURE = True
@@ -158,19 +154,17 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-# by default, user will have to be authenticated to access them, otherwise reset permission in view itself
-
+# IsAuthenticated - by default, user will have to be authenticated to access them, otherwise reset permission in view itself
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        # 'rest_framework.authentication.BasicAuthentication',
-        # 'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
     ]
 }
 
+#this must stay at bottom of file
 import django_heroku
 
 django_heroku.settings(locals())
