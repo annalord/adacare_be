@@ -19,7 +19,7 @@ class Medication(models.Model):
     dosage = models.CharField(max_length=50)
     time = models.CharField(max_length=50)
     notes = models.CharField(max_length=200, null=True, blank=True)
-    refill_date = models.CharField(max_length=25, null=True) 
+    refill_date = models.CharField(max_length=25, null=True, blank=True) 
     is_prescription = models.BooleanField()
 
 class Event(models.Model):
